@@ -33,6 +33,7 @@ ul{
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
 /*Header*/
 header{
     background: #35424a;
@@ -81,9 +82,10 @@ header a:hover{
 /*Showcase*/
 #showcase{
     min-height: 400px;
-    background: url('../resources/showcase.png') no-repeat 0 -400;
+    background:url('../resources/showcase.jpg') no-repeat 0 -400px;
+    
     text-align: center;
-    color: #ffffff;
+    color: #000000;
 }
 
 #showcase h1{
@@ -131,8 +133,8 @@ header a:hover{
 }
 
 #boxes .box img{
-    width: 90px;
-    height: 90px;
+    width: 180px;
+    height: 180px;
 }
 
 footer{
