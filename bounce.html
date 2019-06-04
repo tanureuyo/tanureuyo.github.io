@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Bounce</title>
+        <script type="text/javascript" src="script.js"></script>
+    </head>
+        <body>
+            <script type="text/processing">
+                int x; int y; int Vx; int Vy; int r; 
+void setup(){
+  size(800,600);
+  x = 400;
+  y = 200;
+  Vx = 5;
+  Vy = 5;
+  r = 70;
+}
+void draw(){
+  background(0);
+  ellipse(x,y,r,r);
+  updatePosition();
+  bounce();
+}
+void updatePosition(){
+  x = x + Vx;
+  y = y + Vy;
+}
+void bounce(){
+  if(x > width-r/2){
+    Vx *= -1;
+  }
+  if(y > height-r/2){
+    Vy *= -1;
+  }
+  if(x < r/2){
+    Vx *= -1;
+  }
+  if(y < r/2){
+    Vy *= -1;;
+  }
+}
+            </script>
+            
+            <canvas id="sketch" style="border: 1px solid black;"></canvas>
+        </body>
+</html>

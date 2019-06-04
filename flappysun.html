@@ -1,0 +1,282 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Flappy Sun</title>
+        <script type="text/javascript" src="script.js"></script>
+    </head>
+        <body>
+            <script type="text/processing">
+                import processing.pdf.*;
+                
+                PFont font1; PFont font2; PFont bold;
+                PImage background; PImage sun; 
+                int x; int cx; int cy; int cVy; int moveSpeed;
+                int stars = 7;
+                int gameState; PImage star; int[] sx = new int[stars]; int[] sy = new int[stars]; int count;
+                int score; int highScore; 
+                PImage capemario; int cmx; int cmy;
+                PImage magic; int mx; int my;
+                PImage startscreen; int magicCount; int marioCount;
+                boolean isShooting; boolean bull;
+                int chaseCount;
+    
+                void setup(){
+                  isShooting = true;
+                  bull = false;
+                  gameState = -1;
+                  font2 = createFont("Georgia", 16);
+                  font1 = createFont("CHILLER", 35);
+                  bold = createFont("GEORGIA", 24);
+                  size(1022,498);
+                  background = loadImage("./resources/ghz.png");
+                  sun = loadImage("./resources/angrysun.png");
+                  star = loadImage("./resources/Star.png");
+                  capemario = loadImage("./resources/capemario.png");
+                  magic = loadImage("./resources/magic.png");
+                  startscreen = loadImage("./resources/startscreen.jpg");
+                  
+                  cVy = 2;
+                  cy = 100;
+                  cx = 50;
+                  mx = width + 10000;
+                  cmx = width + 200;
+                  cmy = (int)random(200,600);
+                  for(int i =0; i < stars ; i++){
+                    sx[i] = width + (int)random(50, 200) + 200*i;
+                    sy[i] = height/2 + (int)random(-200,200);
+                  }
+                  
+                }
+                void draw(){
+                  moveSpeed++;
+                  count++;
+                  move();
+                  if(score > highScore){
+                        highScore = score;
+                  }
+                  if(gameState==0){
+                  //draws background to screen as bottom layer
+                  
+                    image(background,x,0);
+                    image(background,x+background.width,0);
+                    image(background,x+2*background.width,0);
+                  
+                  if(score > 35){
+                    cmx++;
+                    x++;
+                    for(int i = 0; i < stars; i++){
+                      sx[i]++;  
+                    }
+                  }
+                  if(x < -(2*background.width+12)){
+                    x=0;
+                  } 
+                  //star code
+                  for(int i = 0; i<stars ; i++){
+                    sx[i]-= 2;
+                    if(sx[i] < -10){
+                      score++;
+                      sx[i] = width + (int)random(50, 200);
+                      sy[i] = height/2 + (int)random(-200,200);
+                    }
+                    if(abs((int)((mx+10)-(sx[i]+5))) < 10 && abs((int)((my+10) - (sy[i]+32))) < 46){
+                      sx[i]+=2000;
+                      mx = width +20000;
+                      score++;
+                    }
+                    if(abs((int)((cx+35)-(sx[i]+7))) < 22 && abs((int)((cy+34) - (sy[i]+41))) < 74){
+                      gameState=1;
+                    }
+                    image(star, sx[i], sy[i]);
+                    
+                    //cape mario code
+                    if(score >10){
+                      cmx -= 1;
+                      if(score > 20){
+                        chaseSun();
+                      }
+                      if(cmx < -100){
+                         cmx = width + 2000;
+                         cmy = (int)random(200,600);
+                      }
+                      if(abs((int)((cx+35)-(cmx+75))) < 80 && abs((int)((cy+34) - (cmy+52))) < 86){
+                        gameState=1;
+                      }
+                      image(capemario, cmx, cmy);
+                    }     
+                  }
+                  //sun code
+                  image(sun, cx,cy);
+                  cy = cy + cVy;
+                  if(count%2 ==0){
+                    cVy ++;
+                  }
+                  x--;
+                  checkCharacter();
+                  
+                  //magic code
+                  image(magic, mx, my);
+                  mx += 10;
+                  if(abs((int)((mx+10)-(cmx+75))) < 80 && abs((int)((my+10) - (cmy+52))) < 86){
+                      cmx+=2000;  
+                      mx =20000;
+                      score++;
+                      if(marioCount==0){
+                        bull = true;
+                      }
+                      if(marioCount>0){
+                        bull = false; 
+                      }
+                      marioCount++;
+                      
+                  }
+                  if(mx > width + 20){
+                    mx = 20000;
+                  } 
+                 
+                 }
+                  //popup that notifies of death and pauses sprites
+                  if(gameState==1){
+                    //BEGIN BUTTON
+                    textSize(34);   
+                    text("You died!", 100,146);
+                    fill(245); 
+                    rect(90,160, 240, 45, 10);  
+                    fill(0);
+                    
+                    
+                    //allows an option to restart game after death
+                    if(mouseX > 90 && mouseY > 160 && mouseX < 330 && mouseY < 205){
+                      if (mousePressed){
+                        cy = 100;
+                        cVy = 2;
+                        cx = 50;
+                        score = 0;
+                        mx = width + 10000;
+                        cmx = width + 200;
+                        cmy = (int)random(200,600);       
+                        for(int i =0; i < stars ; i++){
+                          sx[i] = width + (int)random(50, 200) + 200*i;
+                          sy[i] = height/2 + (int)random(-200,200);
+                        }
+                        gameState=0;             
+                      }
+                 
+                      else{  //HOVER OVER BUT NOT CLICK
+                        fill(255,0,0);
+                        rect(90,160, 240, 45, 10);
+                        fill(0);
+                        text("Play Again?", 100,196);  //TEXT ON BUTTON
+                      }
+                    }
+                    else{
+                      text("Click Me!!", 100,196);  //TEXT ON BUTTON
+                    }  
+                  }
+                  
+                  fill(0);
+                  textSize(18);
+                  text("Score: " + score, width -130, 30);
+                  text("High Score: " + highScore, width - 130, 50);
+                  if(score > 8 && score < 12){
+                    fill(255,50,50);
+                    textSize(50);
+                    text("WARNING! MARIO!!! ", 160, 110);
+                    fill(0);
+                    textSize(16);
+                  }
+                  if(magicCount < 1 && score > 0){
+                    if(score <5){
+                      text("Did you know you can shoot magic?", 120, 30);
+                    }
+                    else{
+                       text("Use the RIGHT MOUSE to shoot", 120, 30);
+                    }
+                  }
+                  if(!isShooting && magicCount >0 && score > 3){
+                     text("Nice Job!  You Learned to Shoot", 120, 30);
+                   }
+                   if(bull &&score < 20){
+                     text("Magic can harm Mario!", 140, 60);
+                   }
+                  
+                  //START SCREEN
+                  if(gameState == -1){
+                    image(startscreen,0,0);
+                    fill(0,0,0, 151);
+                    textSize(24);
+                    textFont(font1);
+                    text("*Click to start", 50, 40);
+                    if(mousePressed && mouseX>0){
+                      gameState = 0;
+                    }   
+                    textFont(font2);
+                    text("MOVE:  LEFT/RIGHT MOUSE", 15, 145);
+                    text("MAGIC:  SPACE OR RIGHT CLICK", 15, 170);
+                    text("FLAP:  LEFT CLICK", 15, 195); 
+                    
+                    fill(0,0,0, 255);
+                    textFont(bold);
+                    text("CONTROLS", 25, 115);
+                    noFill();
+                    rect(10, 125, 248,75, 5);
+                  }
+                  
+                }
+                
+                void move(){
+                  if (mouseX > cx){    
+                    cx+=2;
+                  }
+                  else if(mouseX < cx){
+                    cx-=2;
+                  }
+                }
+                void keyPressed(){
+                  if(key==32){
+                    magic();
+                  }
+                }
+                //changes velocity of sun if pressed
+                void mousePressed(){
+                  if(mouseButton == LEFT){
+                    cVy = -11;
+                  }
+                  else if(mouseButton == RIGHT){
+                    magic();
+                  }
+                }
+                //gives the sun a magic projectile
+                void magic(){
+                  mx = cx + 20;
+                  my = cy + 45;
+                  magicCount++;
+                  if(magicCount > 4){
+                    isShooting = true;
+                  }
+                  else{
+                    isShooting = false;
+                  }
+                }
+                //checks whether or not character is offscreen
+                void checkCharacter(){
+                  if(cy > height || cy < -124){
+                    gameState =1;
+                  }
+                }
+                //moves cape mario towards sun
+                void chaseSun(){
+                   if(cmy > cy && chaseCount%3==0){
+                     cmy--;
+                     cmx--;
+                   }
+                   if(cmy < cy && chaseCount%3==0){
+                     cmy++;
+                     cmx--;
+                   }
+                   chaseCount++;
+                }
+            </script>
+            <canvas id="sketch" style="border: 1px solid black;"></canvas>
+        </body>
+</html>
